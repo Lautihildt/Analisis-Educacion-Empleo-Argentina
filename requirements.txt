@@ -3,3 +3,4 @@ duckdb
 matplotlib
 seaborn
 openpyxl
+geopandas
