@@ -1,61 +1,57 @@
-# 🇦🇷 Análisis de Matriz Productiva y Oferta Educativa en Argentina
+# 🇦🇷 Analysis of Productive Matrix and Educational Supply in Argentina
 
-### Un enfoque de Data Science sobre desigualdades territoriales y brechas estructurales.
+### A Data Science approach to territorial inequalities and structural gaps.
 
-Este proyecto analiza la relación entre la infraestructura educativa y la demanda laboral en Argentina utilizando datos oficiales del año 2022. Mediante un pipeline de ingeniería de datos y análisis geoespacial, se buscó responder: **¿Coincide la oferta de escuelas con la demanda de trabajo a lo largo del país?**
-
----
-
-## 🚀 Resumen Ejecutivo
-El análisis integró fuentes heterogéneas (Padrón de Población, Nómina de Establecimientos Educativos y Registro de Empleo) para identificar patrones de distribución. Se detectó una divergencia estructural: mientras la educación posee una **alta capilaridad territorial** (llega a todos lados), el mercado laboral presenta una **centralización extrema** en la zona núcleo del país.
-
-## 📊 Principales Hallazgos y Visualizaciones
-
-### 1. Centralización del Empleo vs. Distribución Educativa
-El contraste más fuerte del análisis.
-* **Mapa de Empleo:** Se observa un "Corredor Productivo" claro (Buenos Aires, Santa Fe, Córdoba). Fuera de este eje, se detectan "desiertos productivos".
-* **Mapa Educativo:** La infraestructura escolar es mucho más homogénea, actuando como ancla demográfica incluso donde el mercado laboral privado es escaso.
-
-![Mapa de Empleo](img/mapa_geo_empleados.png)
-![Mapa de Educación](img/mapa_geo_educacion.png)
-
-### 2. Brecha de Género: "Paredes de Cristal"
-Al analizar los sectores productivos (CLAE), confirmamos la segregación horizontal.
-* **Sectores Feminizados:** Enseñanza y Salud superan el 70% de participación femenina.
-* **Sectores Masculinizados:** Construcción, Transporte y Agroindustria tienen participaciones menores al 15%, limitando el acceso de mujeres a sectores de ingresos altos.
-
-![Brecha de Género por Sector](img/grafico_participacion_femenina.png)
-
-### 3. Falta de Correlación Lineal
-Los datos sugieren que **la oferta educativa responde a la demografía, no al mercado laboral**. Al normalizar por habitantes, no existe una correlación directa ($R^2$ bajo) entre la densidad de escuelas y la generación de empleo per cápita departamental.
-
-![Correlación Educación Empleo](img/grafico_empleados_vs_educacion_mil_hab.png)
+This project analyzes the relationship between educational infrastructure and labor demand in Argentina using official 2022 data. Through a data engineering pipeline and geospatial analysis, the study aims to answer: **Does the supply of schools align with labor demand across the country?**
 
 ---
 
-## ⚙️ Ingeniería de Datos & Metodología
+## 🚀 Executive Summary
+The analysis integrated heterogeneous sources (Population Census, Educational Institution Registry, and Employment Records) to identify distribution patterns. A structural divergence was detected: while education has **high territorial capillarity** (reaching all regions), the labor market exhibits **extreme centralization** in the country's "core zone."
 
-El proyecto simula un flujo de trabajo real de Data Engineering:
+## 📊 Key Findings and Visualizations
 
-1.  **ETL & Limpieza (Pandas):**
-    * Normalización de datasets gubernamentales (formatos inconsistentes en CSV/Excel).
-    * Estandarización de códigos geográficos (INDEC vs. denominaciones locales) y manejo de inconsistencias en IDs de departamentos.
-2.  **Modelado de Datos:**
-    * Diseño de un esquema relacional normalizado a la **Tercera Forma Normal (3FN)** para garantizar integridad.
-3.  **Calidad de Datos (GQM):**
-    * Aplicación de metodología **Goal-Question-Metric** para auditar la calidad, cuantificando tasas de error en la geolocalización.
-4.  **Análisis SQL Avanzado (DuckDB):**
-    * Uso de SQL embebido en Python para agregaciones complejas y rankings.
+### 1. Employment Centralization vs. Educational Distribution
+The most significant contrast in the analysis.
+* **Employment Map:** A clear "Productive Corridor" is observed (Buenos Aires, Santa Fe, Córdoba). Outside this axis, "productive deserts" are identified.
+* **Education Map:** School infrastructure is much more homogeneous, acting as a demographic anchor even where the private labor market is scarce.
 
-## 🧠 Showcase de SQL (DuckDB)
-Para el análisis se utilizaron **Window Functions** y **CTEs**. Ejemplo de consulta para rankear eficiencia productiva por provincia:
+> **Note:** Insert your map images here using: 
+> `![Employment Map](path_to_your_image/mapa_geo_empleados.png)`
+
+### 2. Gender Gap: "Glass Walls"
+By analyzing productive sectors (CLAE), we confirmed horizontal segregation.
+* **Female-Dominated Sectors:** Education and Healthcare exceed 70% female participation.
+* **Male-Dominated Sectors:** Construction, Transport, and Agribusiness show participation below 15%, limiting women's access to high-income sectors.
+
+### 3. Lack of Linear Correlation
+The data suggests that **educational supply responds to demographics, not to the labor market**. When normalized by population, there is no direct correlation ($R^2$ is low) between school density and per capita employment generation at the departmental level.
+
+---
+
+## ⚙️ Data Engineering & Methodology
+
+The project simulates a real-world Data Engineering workflow:
+
+1.  **ETL & Cleaning (Pandas):**
+    * Normalization of government datasets (handling inconsistent CSV/Excel formats).
+    * Standardization of geographic codes (INDEC vs. local names) and management of inconsistencies in department IDs.
+2.  **Data Modeling:**
+    * Design of a normalized relational schema up to **Third Normal Form (3NF)** to ensure data integrity.
+3.  **Data Quality (GQM):**
+    * Application of the **Goal-Question-Metric** methodology to audit quality, quantifying error rates in geolocation.
+4.  **Advanced SQL Analysis (DuckDB):**
+    * Use of SQL embedded in Python for complex aggregations and rankings.
+
+## 🧠 SQL Showcase (DuckDB)
+The analysis utilized **Window Functions** and **CTEs**. Example query to rank productive efficiency by province:
 
 ```sql
 SELECT 
     d.Provincia_Nombre,
     d.Departamento_Nombre,
     p.Cant_Empresas_Exportadoras,
-    RANK() OVER (PARTITION BY d.Provincia_Nombre ORDER BY p.Cant_Empresas_Exportadoras DESC) as Ranking_Provincial
+    RANK() OVER (PARTITION BY d.Provincia_Nombre ORDER BY p.Cant_Empresas_Exportadoras DESC) as Provincial_Ranking
 FROM departamentos_info d
 JOIN establecimientos_productivos p ON d.Departamento_Id = p.Departamento_Id
 WHERE p.Cant_Empresas_Exportadoras > 10;
